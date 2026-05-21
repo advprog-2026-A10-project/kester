@@ -1,0 +1,24 @@
+{
+	email admin@{$APP_HOST}
+}
+
+{$APP_HOST} {
+	reverse_proxy core-fe:3000
+}
+
+{$AUTH_HOST} {
+	reverse_proxy auth-fe:3000
+}
+
+{$AUTH_API_HOST} {
+	reverse_proxy auth-be:8080
+}
+
+{$CORE_API_HOST} {
+	reverse_proxy core-be:8081
+}
+
+{$ADMIN_API_HOST} {
+	reverse_proxy admin-be:8082
+}
+

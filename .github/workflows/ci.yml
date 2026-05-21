@@ -1,0 +1,102 @@
+name: ci
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+jobs:
+  backend-tests:
+    name: backend tests
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service:
+          - services/bidmart-auth-be
+          - services/bidmart-core-be
+          - services/bidmart-admin-be
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Test ${{ matrix.service }}
+        working-directory: ${{ matrix.service }}
+        run: cargo test --all --all-features
+
+  frontend-tests:
+    name: frontend tests and builds
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service:
+          - services/bidmart-auth-fe
+          - services/bidmart-core-fe
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Enable corepack
+        run: corepack enable
+      - name: Install
+        working-directory: ${{ matrix.service }}
+        run: pnpm install --frozen-lockfile
+      - name: Test
+        working-directory: ${{ matrix.service }}
+        run: pnpm test
+      - name: Typecheck
+        working-directory: ${{ matrix.service }}
+        run: pnpm typecheck
+      - name: Build
+        working-directory: ${{ matrix.service }}
+        env:
+          VITE_API_BASE_URL: http://localhost:18080
+          VITE_REDIRECT_URL: http://localhost:13001
+          VITE_ALLOWED_REDIRECT_ORIGINS: http://localhost:13001
+          VITE_BIDDING_WS_URL: ws://localhost:18081
+          VITE_AUTH_LOGIN_URL: http://localhost:13000/login
+        run: pnpm build
+
+  compose-build:
+    name: docker compose build
+    runs-on: ubuntu-latest
+    needs: [backend-tests, frontend-tests]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Validate compose config
+        run: docker compose --env-file .env.ci -f docker-compose.yml -f docker-compose.ci.yml config
+      - name: Build images
+        run: docker compose --env-file .env.ci -f docker-compose.yml -f docker-compose.ci.yml build
+
+  compose-smoke:
+    name: docker compose smoke
+    runs-on: ubuntu-latest
+    needs: [compose-build]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Build runtime images
+        run: docker compose --env-file .env.ci -f docker-compose.yml -f docker-compose.ci.yml build
+      - name: Start services
+        run: docker compose --env-file .env.ci -f docker-compose.yml -f docker-compose.ci.yml up -d postgres auth-be core-be admin-be auth-fe core-fe
+      - name: Wait for services
+        run: sleep 20
+      - name: Smoke HTTP endpoints
+        run: bash scripts/smoke-http.sh
+      - name: Compose logs
+        if: always()
+        run: docker compose --env-file .env.ci -f docker-compose.yml -f docker-compose.ci.yml logs --no-color
+      - name: Stop services
+        if: always()
+        run: docker compose --env-file .env.ci -f docker-compose.yml -f docker-compose.ci.yml down -v
+

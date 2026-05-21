@@ -1,0 +1,176 @@
+name: bidmart-alpha
+
+services:
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-postgres}
+      AUTH_DATABASE_NAME: ${AUTH_DATABASE_NAME:-bidmart_auth}
+      CORE_DATABASE_NAME: ${CORE_DATABASE_NAME:-bidmart_core}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./deploy/postgres-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB:-postgres}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks:
+      - bidmart-internal
+
+  auth-be:
+    build:
+      context: ./services/bidmart-auth-be
+    restart: unless-stopped
+    environment:
+      APP_ENV: ${APP_ENV:-alpha}
+      RUST_LOG: info
+      APP_SERVER_HOST: 0.0.0.0
+      APP_SERVER_PORT: 8080
+      APP_DATABASE_URL: ${AUTH_DATABASE_URL}
+      APP_AUTH_MIN_PASSWORD_LENGTH: ${APP_AUTH_MIN_PASSWORD_LENGTH:-8}
+      APP_AUTH_VERIFICATION_TOKEN_TTL_SECONDS: ${APP_AUTH_VERIFICATION_TOKEN_TTL_SECONDS:-900}
+      APP_AUTH_RESEND_COOLDOWN_SECONDS: ${APP_AUTH_RESEND_COOLDOWN_SECONDS:-30}
+      APP_AUTH_PASSWORD_RESET_TOKEN_TTL_SECONDS: ${APP_AUTH_PASSWORD_RESET_TOKEN_TTL_SECONDS:-900}
+      APP_AUTH_PASSWORD_RESET_COOLDOWN_SECONDS: ${APP_AUTH_PASSWORD_RESET_COOLDOWN_SECONDS:-30}
+      APP_AUTH_MFA_TICKET_TTL_SECONDS: ${APP_AUTH_MFA_TICKET_TTL_SECONDS:-300}
+      APP_AUTH_EMAIL_MFA_CODE_TTL_SECONDS: ${APP_AUTH_EMAIL_MFA_CODE_TTL_SECONDS:-300}
+      APP_AUTH_EMAIL_MFA_COOLDOWN_SECONDS: ${APP_AUTH_EMAIL_MFA_COOLDOWN_SECONDS:-30}
+      APP_AUTH_ACCESS_TOKEN_TTL_SECONDS: ${APP_AUTH_ACCESS_TOKEN_TTL_SECONDS:-3600}
+      APP_AUTH_TOTP_SETUP_TTL_SECONDS: ${APP_AUTH_TOTP_SETUP_TTL_SECONDS:-600}
+      APP_AUTH_JWT_SECRET: ${APP_AUTH_JWT_SECRET}
+      APP_EMAIL_DELIVERY_MODE: ${APP_EMAIL_DELIVERY_MODE:-resend}
+      APP_RESEND_API_KEY: ${APP_RESEND_API_KEY}
+      APP_RESEND_FROM_EMAIL: ${APP_RESEND_FROM_EMAIL}
+      APP_VERIFY_EMAIL_URL_BASE: ${APP_VERIFY_EMAIL_URL_BASE}
+      APP_PASSWORD_RESET_URL_BASE: ${APP_PASSWORD_RESET_URL_BASE}
+      APP_CORS_ALLOWED_ORIGINS: ${APP_CORS_ALLOWED_ORIGINS}
+      APP_AUTH_SESSION_COOKIE_NAME: ${APP_AUTH_SESSION_COOKIE_NAME:-auth_session}
+      APP_AUTH_SESSION_COOKIE_SECURE: ${APP_AUTH_SESSION_COOKIE_SECURE:-true}
+      APP_AUTH_SESSION_COOKIE_SAME_SITE: ${APP_AUTH_SESSION_COOKIE_SAME_SITE:-Lax}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - bidmart-internal
+
+  core-be:
+    build:
+      context: ./services/bidmart-core-be
+    restart: unless-stopped
+    environment:
+      RUST_LOG: info
+      APP_SERVER_HOST: 0.0.0.0
+      APP_SERVER_PORT: 8081
+      APP_DATABASE_URL: ${CORE_DATABASE_URL}
+      APP_AUTH_BASE_URL: http://auth-be:8080
+      APP_AUTO_MIGRATE_ON_STARTUP: ${APP_AUTO_MIGRATE_ON_STARTUP:-true}
+      APP_BIDDING_FINALIZER_INTERVAL_SECS: ${APP_BIDDING_FINALIZER_INTERVAL_SECS:-5}
+      APP_BIDDING_FINALIZER_BATCH_SIZE: ${APP_BIDDING_FINALIZER_BATCH_SIZE:-25}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      auth-be:
+        condition: service_started
+    networks:
+      - bidmart-internal
+
+  admin-be:
+    build:
+      context: ./services/bidmart-admin-be
+    restart: unless-stopped
+    environment:
+      RUST_LOG: info
+      APP_SERVER_HOST: 0.0.0.0
+      APP_SERVER_PORT: 8082
+      APP_AUTH_DATABASE_URL: ${AUTH_DATABASE_URL}
+      APP_CORE_DATABASE_URL: ${CORE_DATABASE_URL}
+      APP_AUTH_BASE_URL: http://auth-be:8080
+    depends_on:
+      postgres:
+        condition: service_healthy
+      auth-be:
+        condition: service_started
+      core-be:
+        condition: service_started
+    networks:
+      - bidmart-internal
+
+  auth-fe:
+    build:
+      context: ./services/bidmart-auth-fe
+      args:
+        VITE_API_BASE_URL: ${PUBLIC_AUTH_API_URL}
+        VITE_REDIRECT_URL: ${PUBLIC_APP_URL}
+        VITE_ALLOWED_REDIRECT_ORIGINS: ${VITE_ALLOWED_REDIRECT_ORIGINS}
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 3000
+    depends_on:
+      auth-be:
+        condition: service_started
+    networks:
+      - bidmart-internal
+
+  core-fe:
+    build:
+      context: ./services/bidmart-core-fe
+      args:
+        VITE_API_BASE_URL: ${PUBLIC_CORE_API_URL}
+        VITE_BIDDING_WS_URL: ${PUBLIC_BIDDING_WS_URL}
+        VITE_AUTH_LOGIN_URL: ${PUBLIC_AUTH_URL}/login
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 3000
+    depends_on:
+      core-be:
+        condition: service_started
+    networks:
+      - bidmart-internal
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      APP_HOST: ${APP_HOST}
+      AUTH_HOST: ${AUTH_HOST}
+      AUTH_API_HOST: ${AUTH_API_HOST}
+      CORE_API_HOST: ${CORE_API_HOST}
+      ADMIN_API_HOST: ${ADMIN_API_HOST}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      auth-fe:
+        condition: service_started
+      core-fe:
+        condition: service_started
+      auth-be:
+        condition: service_started
+      core-be:
+        condition: service_started
+      admin-be:
+        condition: service_started
+    networks:
+      - bidmart-internal
+
+volumes:
+  postgres-data:
+  caddy-data:
+  caddy-config:
+
+networks:
+  bidmart-internal:
+    driver: bridge
+

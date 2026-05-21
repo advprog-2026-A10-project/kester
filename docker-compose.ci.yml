@@ -1,0 +1,21 @@
+services:
+  auth-be:
+    ports:
+      - "18080:8080"
+
+  core-be:
+    ports:
+      - "18081:8081"
+
+  admin-be:
+    ports:
+      - "18082:8082"
+
+  auth-fe:
+    ports:
+      - "13000:3000"
+
+  core-fe:
+    ports:
+      - "13001:3000"
+
