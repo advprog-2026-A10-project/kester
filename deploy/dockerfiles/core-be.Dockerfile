@@ -9,9 +9,7 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY --from=builder /app/target/release/bidmart-core-be /usr/local/bin/app
-COPY --from=builder /app/target/release/migrate /usr/local/bin/migrate
 COPY --from=builder /app/migrations ./migrations
 EXPOSE 8080
 ENV RUST_LOG=info
 CMD ["/usr/local/bin/app"]
-
