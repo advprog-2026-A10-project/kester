@@ -102,6 +102,25 @@ services:
     networks:
       - bidmart-internal
 
+  bidding-ws:
+    build:
+      context: ./services/bidmart-bidding-ws
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      WS_SERVER_HOST: 0.0.0.0
+      WS_SERVER_PORT: 8080
+      WS_POLL_INTERVAL_MS: ${WS_POLL_INTERVAL_MS:-2000}
+      WS_HEARTBEAT_MS: ${WS_HEARTBEAT_MS:-30000}
+      CORE_DATABASE_URL: ${CORE_DATABASE_URL}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      core-be:
+        condition: service_started
+    networks:
+      - bidmart-internal
+
   auth-fe:
     build:
       context: ./services/bidmart-auth-fe
@@ -138,6 +157,23 @@ services:
     networks:
       - bidmart-internal
 
+  admin-fe:
+    build:
+      context: .
+      dockerfile: deploy/dockerfiles/admin-fe.Dockerfile
+      args:
+        VITE_API_BASE_URL: ${PUBLIC_ADMIN_API_URL}
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 3000
+    depends_on:
+      admin-be:
+        condition: service_started
+    networks:
+      - bidmart-internal
+
   caddy:
     image: caddy:2-alpine
     restart: unless-stopped
@@ -150,6 +186,8 @@ services:
       AUTH_API_HOST: ${AUTH_API_HOST}
       CORE_API_HOST: ${CORE_API_HOST}
       ADMIN_API_HOST: ${ADMIN_API_HOST}
+      ADMIN_HOST: ${ADMIN_HOST}
+      WS_HOST: ${WS_HOST}
     volumes:
       - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy-data:/data
@@ -159,11 +197,15 @@ services:
         condition: service_started
       core-fe:
         condition: service_started
+      admin-fe:
+        condition: service_started
       auth-be:
         condition: service_started
       core-be:
         condition: service_started
       admin-be:
+        condition: service_started
+      bidding-ws:
         condition: service_started
     networks:
       - bidmart-internal

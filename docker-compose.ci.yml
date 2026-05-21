@@ -11,6 +11,10 @@ services:
     ports:
       - "18082:8082"
 
+  bidding-ws:
+    ports:
+      - "18083:8080"
+
   auth-fe:
     ports:
       - "13000:3000"
@@ -19,3 +23,6 @@ services:
     ports:
       - "13001:3000"
 
+  admin-fe:
+    ports:
+      - "13002:3000"

@@ -11,14 +11,8 @@ Create these `A` records:
 | `A` | `api.auth` | `<GCP_STATIC_EXTERNAL_IP>` |
 | `A` | `api` | `<GCP_STATIC_EXTERNAL_IP>` |
 | `A` | `admin-api` | `<GCP_STATIC_EXTERNAL_IP>` |
-
-Optional future records:
-
-| Type | Host | Value | Notes |
-| --- | --- | --- | --- |
-| `A` | `admin` | `<GCP_STATIC_EXTERNAL_IP>` | Only after Admin FE has a `develop` deployment. |
-| `A` | `ws` | `<GCP_STATIC_EXTERNAL_IP>` | Only after bidding websocket is packaged from `develop`. |
-| `A` | `docs` | `<docs hosting IP or CNAME target>` | Use for Cloud Storage/static docs later. |
+| `A` | `admin` | `<GCP_STATIC_EXTERNAL_IP>` |
+| `A` | `ws` | `<GCP_STATIC_EXTERNAL_IP>` |
 
 Public ports:
 
@@ -31,6 +25,7 @@ Keep these internal only:
 - Auth BE `8080`
 - Core BE `8081`
 - Admin BE `8082`
+- Bidding WS `8080`
 - Auth FE `3000`
 - Core FE `3000`
-
+- Admin FE `3000`

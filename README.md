@@ -2,23 +2,20 @@
 
 Experimental deployment wrapper for `advprog-2026-A10-project`.
 
-This repo packages the available `develop` branches into a one-VM Docker Compose stack for
+This repo packages the available `staging` branches into a one-VM Docker Compose stack for
 alpha testing on Google Cloud Compute Engine. It does not deploy anything by itself.
 
 ## Included Services
 
-- `bidmart-auth-be` from `develop`
-- `bidmart-auth-fe` from `develop`
-- `bidmart-core-be` from `develop`
-- `bidmart-core-fe` from `develop`
-- `bidmart-admin-be` from `develop`
+- `bidmart-auth-be` from `staging`
+- `bidmart-auth-fe` from `staging`
+- `bidmart-core-be` from `staging`
+- `bidmart-core-fe` from `staging`
+- `bidmart-admin-be` from `staging`
+- `bidmart-admin-fe` from `staging`
+- `bidmart-bidding-ws` from `staging`
 - Postgres 16
 - Caddy reverse proxy
-
-Not included yet:
-
-- `bidmart-admin-fe`: no `develop` branch found during discovery.
-- `bidmart-bidding-ws`: no `develop` branch found during discovery.
 
 ## Local Source Update
 
@@ -51,4 +48,3 @@ docker compose --env-file .env up -d
 - Only ports 80 and 443 should be public on the VM.
 - Database and backend ports stay on the Docker network.
 - Docker build/test validation runs in GitHub Actions.
-

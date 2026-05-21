@@ -95,9 +95,9 @@ Health checks:
 ```bash
 curl -f https://api.auth.bidmart.bid/health
 curl -f https://api.auth.bidmart.bid/ready
-curl -f https://api.bidmart.bid/health
-curl -f https://api.bidmart.bid/ready
+curl -f https://api.bidmart.bid/catalog
 curl -f https://admin-api.bidmart.bid/health
+curl -f https://ws.bidmart.bid/
 ```
 
 Stop:
@@ -107,4 +107,3 @@ docker compose --env-file .env down
 ```
 
 Do not delete the `postgres-data` volume unless you intentionally want to remove alpha data.
-

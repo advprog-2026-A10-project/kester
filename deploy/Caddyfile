@@ -10,6 +10,10 @@
 	reverse_proxy auth-fe:3000
 }
 
+{$ADMIN_HOST} {
+	reverse_proxy admin-fe:3000
+}
+
 {$AUTH_API_HOST} {
 	reverse_proxy auth-be:8080
 }
@@ -22,3 +26,6 @@
 	reverse_proxy admin-be:8082
 }
 
+{$WS_HOST} {
+	reverse_proxy bidding-ws:8080
+}

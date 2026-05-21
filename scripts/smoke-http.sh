@@ -16,5 +16,7 @@ curl --fail --show-error --silent http://127.0.0.1:18080/ready
 expect_http_response http://127.0.0.1:18081/catalog
 curl --fail --show-error --silent http://127.0.0.1:18082/health
 curl --fail --show-error --silent http://127.0.0.1:18082/ready
+curl --fail --show-error --silent http://127.0.0.1:18083 >/dev/null
 curl --fail --show-error --silent http://127.0.0.1:13000 >/dev/null
 curl --fail --show-error --silent http://127.0.0.1:13001 >/dev/null
+curl --fail --show-error --silent http://127.0.0.1:13002 >/dev/null
