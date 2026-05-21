@@ -9,6 +9,7 @@ RUN if [ -f pnpm-lock.yaml ]; then corepack enable && pnpm install --frozen-lock
     elif [ -f package-lock.json ]; then npm ci; \
     else npm install; fi
 COPY services/bidmart-admin-fe .
+COPY deploy/overrides/admin-fe ./
 RUN if [ -f pnpm-lock.yaml ]; then corepack enable && pnpm run build; \
     elif [ -f yarn.lock ]; then yarn build; \
     else npm run build; fi
@@ -23,4 +24,3 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/build ./build
 EXPOSE 3000
 CMD ["./node_modules/.bin/react-router-serve", "./build/server/index.js"]
-
