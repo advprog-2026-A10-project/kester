@@ -1,6 +1,7 @@
 FROM rust:1.88-bookworm AS builder
 WORKDIR /app
 COPY services/bidmart-auth-be .
+COPY deploy/overrides/auth-be ./
 RUN cargo build --release
 
 FROM debian:bookworm-slim
