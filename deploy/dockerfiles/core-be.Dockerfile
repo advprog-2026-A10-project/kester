@@ -1,7 +1,6 @@
 FROM rust:1.88-bookworm AS builder
 WORKDIR /app
 COPY services/bidmart-core-be .
-COPY deploy/overrides/core-be ./
 RUN cargo build --release --bins
 
 FROM debian:bookworm-slim

@@ -13,7 +13,6 @@ RUN if [ -f pnpm-lock.yaml ]; then corepack enable && pnpm install --frozen-lock
     elif [ -f package-lock.json ]; then npm ci; \
     else npm install; fi
 COPY services/bidmart-auth-fe .
-COPY deploy/overrides/auth-fe ./
 RUN if [ -f pnpm-lock.yaml ]; then corepack enable && pnpm run build; \
     elif [ -f yarn.lock ]; then yarn build; \
     else npm run build; fi
