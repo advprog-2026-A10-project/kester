@@ -45,7 +45,7 @@ jobs:
         with:
           node-version: 20
       - name: Enable corepack
-        run: corepack enable
+        run: corepack enable && corepack prepare pnpm@9.15.5 --activate
       - name: Install
         working-directory: ${{ matrix.service }}
         run: pnpm install --frozen-lockfile
@@ -95,7 +95,7 @@ jobs:
         with:
           node-version: 20
       - name: Enable corepack
-        run: corepack enable
+        run: corepack enable && corepack prepare pnpm@9.15.5 --activate
       - name: Install
         working-directory: services/bidmart-bidding-ws
         run: pnpm install --frozen-lockfile

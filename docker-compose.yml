@@ -104,7 +104,8 @@ services:
 
   bidding-ws:
     build:
-      context: ./services/bidmart-bidding-ws
+      context: .
+      dockerfile: deploy/dockerfiles/bidding-ws.Dockerfile
     restart: unless-stopped
     environment:
       NODE_ENV: production
