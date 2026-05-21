@@ -30,12 +30,6 @@ jobs:
   frontend-tests:
     name: frontend tests and builds
     runs-on: ubuntu-latest
-    env:
-      VITE_API_BASE_URL: http://localhost:18080
-      VITE_REDIRECT_URL: http://localhost:13001
-      VITE_ALLOWED_REDIRECT_ORIGINS: http://localhost:13001
-      VITE_BIDDING_WS_URL: ws://localhost:18081
-      VITE_AUTH_LOGIN_URL: http://localhost:13000/login
     strategy:
       fail-fast: false
       matrix:
@@ -56,12 +50,24 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Test
         working-directory: ${{ matrix.service }}
+        env:
+          VITE_API_BASE_URL: http://localhost:18080
+          VITE_REDIRECT_URL: http://localhost:13001
+          VITE_ALLOWED_REDIRECT_ORIGINS: http://localhost:13001
+          VITE_BIDDING_WS_URL: ws://localhost:8080
+          VITE_AUTH_LOGIN_URL: /auth/login
         run: pnpm test
       - name: Typecheck
         working-directory: ${{ matrix.service }}
         run: pnpm typecheck
       - name: Build
         working-directory: ${{ matrix.service }}
+        env:
+          VITE_API_BASE_URL: http://localhost:18080
+          VITE_REDIRECT_URL: http://localhost:13001
+          VITE_ALLOWED_REDIRECT_ORIGINS: http://localhost:13001
+          VITE_BIDDING_WS_URL: ws://localhost:18081
+          VITE_AUTH_LOGIN_URL: http://localhost:13000/login
         run: pnpm build
 
   compose-build:
