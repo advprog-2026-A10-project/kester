@@ -10,7 +10,10 @@ RUN apt-get update \
 WORKDIR /app
 COPY --from=builder /app/target/release/bidmart-auth-be /usr/local/bin/app
 COPY --from=builder /app/migrations ./migrations
+# Staging currently contains unresolved conflict markers in the timestamped
+# migration. Keep the source submodule untouched and use the clean schema copy
+# that ships beside it so alpha containers can initialize a fresh database.
+RUN cp ./migrations/schema.sql ./migrations/20260223191047_auth_schema.sql
 EXPOSE 8080
 ENV RUST_LOG=info
 CMD ["/usr/local/bin/app"]
-
