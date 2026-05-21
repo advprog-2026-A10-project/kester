@@ -3,11 +3,11 @@
 }
 
 {$APP_HOST} {
-	reverse_proxy core-fe:3000
+	reverse_proxy core-fe:80
 }
 
 {$AUTH_HOST} {
-	reverse_proxy auth-fe:3000
+	reverse_proxy auth-fe:80
 }
 
 {$ADMIN_HOST} {
