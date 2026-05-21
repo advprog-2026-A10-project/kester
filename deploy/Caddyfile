@@ -2,6 +2,27 @@
 	email admin@{$APP_HOST}
 }
 
+(api_cors) {
+	@allowed_origin header_regexp Origin ^https://(bidmart\.bid|auth\.bidmart\.bid|admin\.bidmart\.bid)$
+	header @allowed_origin Access-Control-Allow-Origin "{http.request.header.Origin}"
+	header @allowed_origin Access-Control-Allow-Credentials "true"
+	header @allowed_origin Vary "Origin"
+
+	@preflight_allowed {
+		method OPTIONS
+		header_regexp Origin ^https://(bidmart\.bid|auth\.bidmart\.bid|admin\.bidmart\.bid)$
+	}
+	handle @preflight_allowed {
+		header Access-Control-Allow-Origin "{http.request.header.Origin}"
+		header Access-Control-Allow-Credentials "true"
+		header Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+		header Access-Control-Allow-Headers "Content-Type, Authorization, Accept"
+		header Access-Control-Max-Age "600"
+		header Vary "Origin"
+		respond "" 204
+	}
+}
+
 {$APP_HOST} {
 	reverse_proxy core-fe:3000
 }
@@ -15,14 +36,17 @@
 }
 
 {$AUTH_API_HOST} {
+	import api_cors
 	reverse_proxy auth-be:8080
 }
 
 {$CORE_API_HOST} {
+	import api_cors
 	reverse_proxy core-be:8081
 }
 
 {$ADMIN_API_HOST} {
+	import api_cors
 	reverse_proxy admin-be:8082
 }
 
