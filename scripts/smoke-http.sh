@@ -22,7 +22,7 @@ expect_http_response() {
 
 curl_ok "auth-be health" http://127.0.0.1:18080/health
 curl_ok "auth-be ready" http://127.0.0.1:18080/ready
-expect_http_response "core-be catalog" http://127.0.0.1:18081/catalog
+expect_http_response "core-be catalog" http://127.0.0.1:18081/api/v1/catalog
 curl_ok "admin-be health" http://127.0.0.1:18082/health
 curl_ok "admin-be ready" http://127.0.0.1:18082/ready
 curl_ok "bidding-ws health" http://127.0.0.1:18083
