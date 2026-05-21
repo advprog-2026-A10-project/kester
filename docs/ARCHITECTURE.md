@@ -34,6 +34,10 @@ Porkbun DNS
 Only ports `80` and `443` should be public. Postgres and backend ports stay private on the
 Docker network.
 
+Backend containers use deployment-owned Dockerfiles under `deploy/dockerfiles/`. They mirror the
+service Dockerfiles but build with Rust 1.88+, because the current dependency graph no longer
+builds with the older Rust image pinned inside some source repositories.
+
 ## Alpha Limitations
 
 - Database is a Compose-managed Postgres container on the same VM.
@@ -41,4 +45,3 @@ Docker network.
   `bidmart-bidding-ws` repo is not included because it has no `develop` branch.
 - Admin frontend is not included because `bidmart-admin-fe` has no `develop` branch.
 - This repo is for alpha testing, not production hardening.
-

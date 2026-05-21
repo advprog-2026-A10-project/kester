@@ -23,7 +23,8 @@ services:
 
   auth-be:
     build:
-      context: ./services/bidmart-auth-be
+      context: .
+      dockerfile: deploy/dockerfiles/auth-be.Dockerfile
     restart: unless-stopped
     environment:
       APP_ENV: ${APP_ENV:-alpha}
@@ -59,7 +60,8 @@ services:
 
   core-be:
     build:
-      context: ./services/bidmart-core-be
+      context: .
+      dockerfile: deploy/dockerfiles/core-be.Dockerfile
     restart: unless-stopped
     environment:
       RUST_LOG: info
@@ -80,7 +82,8 @@ services:
 
   admin-be:
     build:
-      context: ./services/bidmart-admin-be
+      context: .
+      dockerfile: deploy/dockerfiles/admin-be.Dockerfile
     restart: unless-stopped
     environment:
       RUST_LOG: info
@@ -173,4 +176,3 @@ volumes:
 networks:
   bidmart-internal:
     driver: bridge
-

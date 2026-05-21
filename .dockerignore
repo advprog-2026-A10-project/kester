@@ -1,0 +1,13 @@
+.git
+**/.git
+**/target
+**/node_modules
+**/dist
+**/build
+**/.next
+**/coverage
+.env
+.env.*
+!.env.example
+!.env.ci
+
