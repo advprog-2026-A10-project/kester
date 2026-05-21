@@ -17,11 +17,11 @@ services:
 
   auth-fe:
     ports:
-      - "13000:80"
+      - "13000:3000"
 
   core-fe:
     ports:
-      - "13001:80"
+      - "13001:3000"
 
   admin-fe:
     ports:
