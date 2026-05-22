@@ -90,6 +90,27 @@ docker compose --env-file .env up -d
 docker compose ps
 ```
 
+For normal alpha deployment with prebuilt GHCR images, use:
+
+```bash
+docker compose --env-file .env pull
+docker compose --env-file .env up -d
+docker compose ps
+```
+
+Set `IMAGE_TAG=latest` for the newest alpha image, or set it to a short git SHA from the `images`
+GitHub Actions workflow to deploy/rollback a specific version.
+
+Rollback:
+
+```bash
+nano .env
+# set IMAGE_TAG to the previous known-good short SHA
+docker compose --env-file .env pull
+docker compose --env-file .env up -d
+docker compose ps
+```
+
 Health checks:
 
 ```bash

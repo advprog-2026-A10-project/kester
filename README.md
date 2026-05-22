@@ -32,9 +32,33 @@ On the Google Cloud VM:
 ```bash
 cp .env.example .env
 # edit .env and replace secrets/domains
+docker compose --env-file .env pull
+docker compose --env-file .env up -d
+```
+
+To build directly on the VM instead of using GHCR images:
+
+```bash
 docker compose --env-file .env build
 docker compose --env-file .env up -d
 ```
+
+## Image Versioning and Rollback
+
+GitHub Actions publishes service images to GitHub Container Registry with two tags:
+
+- `latest` for the newest alpha build from `main`
+- the short git SHA for a pinned rollback target
+
+The VM reads `IMAGE_TAG` from `.env`. To deploy a pinned version:
+
+```bash
+IMAGE_TAG=0123456
+docker compose --env-file .env pull
+docker compose --env-file .env up -d
+```
+
+To roll back, change `IMAGE_TAG` to the previous known-good SHA, then run the same `pull` and `up -d` commands.
 
 ## Documentation
 

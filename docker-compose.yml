@@ -22,12 +22,14 @@ services:
       - bidmart-internal
 
   auth-be:
+    image: ${AUTH_BE_IMAGE:-ghcr.io/advprog-2026-a10-project/kester-auth-be:${IMAGE_TAG:-latest}}
     build:
       context: .
       dockerfile: deploy/dockerfiles/auth-be.Dockerfile
     restart: unless-stopped
     environment:
       APP_ENV: ${APP_ENV:-alpha}
+      APP_LOG_FORMAT: ${APP_LOG_FORMAT:-json}
       RUST_LOG: info
       APP_SERVER_HOST: 0.0.0.0
       APP_SERVER_PORT: 8080
@@ -59,6 +61,7 @@ services:
       - bidmart-internal
 
   core-be:
+    image: ${CORE_BE_IMAGE:-ghcr.io/advprog-2026-a10-project/kester-core-be:${IMAGE_TAG:-latest}}
     build:
       context: .
       dockerfile: deploy/dockerfiles/core-be.Dockerfile
@@ -81,6 +84,7 @@ services:
       - bidmart-internal
 
   admin-be:
+    image: ${ADMIN_BE_IMAGE:-ghcr.io/advprog-2026-a10-project/kester-admin-be:${IMAGE_TAG:-latest}}
     build:
       context: .
       dockerfile: deploy/dockerfiles/admin-be.Dockerfile
@@ -103,6 +107,7 @@ services:
       - bidmart-internal
 
   bidding-ws:
+    image: ${BIDDING_WS_IMAGE:-ghcr.io/advprog-2026-a10-project/kester-bidding-ws:${IMAGE_TAG:-latest}}
     build:
       context: .
       dockerfile: deploy/dockerfiles/bidding-ws.Dockerfile
@@ -123,6 +128,7 @@ services:
       - bidmart-internal
 
   auth-fe:
+    image: ${AUTH_FE_IMAGE:-ghcr.io/advprog-2026-a10-project/kester-auth-fe:${IMAGE_TAG:-latest}}
     build:
       context: .
       dockerfile: deploy/dockerfiles/auth-fe.Dockerfile
@@ -142,6 +148,7 @@ services:
       - bidmart-internal
 
   core-fe:
+    image: ${CORE_FE_IMAGE:-ghcr.io/advprog-2026-a10-project/kester-core-fe:${IMAGE_TAG:-latest}}
     build:
       context: .
       dockerfile: deploy/dockerfiles/core-fe.Dockerfile
@@ -162,6 +169,7 @@ services:
       - bidmart-internal
 
   admin-fe:
+    image: ${ADMIN_FE_IMAGE:-ghcr.io/advprog-2026-a10-project/kester-admin-fe:${IMAGE_TAG:-latest}}
     build:
       context: .
       dockerfile: deploy/dockerfiles/admin-fe.Dockerfile
