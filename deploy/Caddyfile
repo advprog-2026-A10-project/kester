@@ -36,7 +36,6 @@
 }
 
 {$AUTH_API_HOST} {
-	import api_cors
 	reverse_proxy auth-be:8080
 }
 
