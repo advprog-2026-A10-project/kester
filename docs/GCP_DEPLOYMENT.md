@@ -101,6 +101,17 @@ docker compose ps
 Set `IMAGE_TAG=latest` for the newest alpha image, or set it to a short git SHA from the `images`
 GitHub Actions workflow to deploy/rollback a specific version.
 
+If GHCR packages are private, the VM must authenticate before `docker compose pull`:
+
+```bash
+echo "$GHCR_READ_TOKEN" | docker login ghcr.io -u "<github-username>" --password-stdin
+```
+
+Use a token with the smallest practical scope, normally package read access only. Alternatively,
+make the alpha GHCR packages public so the VM does not need a GitHub token. If neither is available,
+the VM can still build from source with `docker compose --env-file .env build`, but that is slower
+and less useful for rollback evidence.
+
 Rollback:
 
 ```bash
