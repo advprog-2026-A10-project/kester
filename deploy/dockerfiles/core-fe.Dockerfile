@@ -2,9 +2,11 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 ARG VITE_API_BASE_URL=""
 ARG VITE_BIDDING_WS_URL=""
+ARG VITE_AUTH_API_BASE_URL=""
 ARG VITE_AUTH_LOGIN_URL=""
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 ENV VITE_BIDDING_WS_URL=$VITE_BIDDING_WS_URL
+ENV VITE_AUTH_API_BASE_URL=$VITE_AUTH_API_BASE_URL
 ENV VITE_AUTH_LOGIN_URL=$VITE_AUTH_LOGIN_URL
 COPY services/bidmart-core-fe/package.json ./
 COPY services/bidmart-core-fe/pnpm-lock.yaml* services/bidmart-core-fe/yarn.lock* services/bidmart-core-fe/package-lock.json* ./

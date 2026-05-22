@@ -13,7 +13,7 @@ Copy `.env.example` to `.env` on the Google Cloud VM. Do not commit `.env`.
 | `WS_HOST` | `ws.bidmart.bid` | Caddy/Bidding WS | No | Yes |
 | `PUBLIC_APP_URL` | `https://bidmart.bid` | FE build/Auth links | No | Yes |
 | `PUBLIC_AUTH_URL` | `https://auth.bidmart.bid` | Core FE | No | Yes |
-| `PUBLIC_AUTH_API_URL` | `https://api.auth.bidmart.bid` | Auth FE build | No | Yes |
+| `PUBLIC_AUTH_API_URL` | `https://api.auth.bidmart.bid` | Auth FE build/Core FE session validation | No | Yes |
 | `PUBLIC_CORE_API_URL` | `https://api.bidmart.bid` | Core FE build | No | Yes |
 | `PUBLIC_ADMIN_API_URL` | `https://admin-api.bidmart.bid` | Admin FE build | No | Yes |
 | `PUBLIC_BIDDING_WS_URL` | `wss://ws.bidmart.bid` | Core FE build | No | Yes |
