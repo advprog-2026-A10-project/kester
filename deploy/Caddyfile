@@ -24,10 +24,16 @@
 }
 
 {$APP_HOST} {
+	redir /login https://{$AUTH_HOST}/auth/login 302
+	redir /signin https://{$AUTH_HOST}/auth/login 302
+	redir /order /orders 302
 	reverse_proxy core-fe:3000
 }
 
 {$AUTH_HOST} {
+	redir /login /auth/login 302
+	redir /signin /auth/login 302
+	redir /register /auth/register 302
 	reverse_proxy auth-fe:3000
 }
 
