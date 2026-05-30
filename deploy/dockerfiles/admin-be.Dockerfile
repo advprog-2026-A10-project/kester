@@ -1,4 +1,4 @@
-FROM rust:1.88-bookworm AS builder
+FROM rust:1.92-bookworm AS builder
 WORKDIR /app
 COPY services/bidmart-admin-be .
 RUN cargo build --release
@@ -12,4 +12,3 @@ COPY --from=builder /app/target/release/bidmart-admin-be /usr/local/bin/app
 EXPOSE 8080
 ENV RUST_LOG=info
 CMD ["/usr/local/bin/app"]
-

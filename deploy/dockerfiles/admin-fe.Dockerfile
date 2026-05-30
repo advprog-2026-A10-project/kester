@@ -1,26 +1,13 @@
-FROM node:20-alpine AS builder
+FROM node:20-alpine
 WORKDIR /app
-ARG VITE_API_BASE_URL=""
-ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
-COPY services/bidmart-admin-fe/package.json ./
-COPY services/bidmart-admin-fe/pnpm-lock.yaml* services/bidmart-admin-fe/yarn.lock* services/bidmart-admin-fe/package-lock.json* ./
-RUN if [ -f pnpm-lock.yaml ]; then corepack enable && pnpm install --frozen-lockfile; \
-    elif [ -f yarn.lock ]; then corepack enable && yarn install --frozen-lockfile; \
-    elif [ -f package-lock.json ]; then npm ci; \
-    else npm install; fi
-COPY services/bidmart-admin-fe .
-COPY deploy/overrides/admin-fe ./
-RUN if [ -f pnpm-lock.yaml ]; then corepack enable && pnpm run build; \
-    elif [ -f yarn.lock ]; then yarn build; \
-    else npm run build; fi
-
-FROM node:20-alpine AS runner
-WORKDIR /app
-ENV NODE_ENV=production
-ENV HOST=0.0.0.0
-ENV PORT=3000
-COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/build ./build
+RUN cat > server.mjs <<'JS'
+import http from 'node:http';
+const port = Number(process.env.PORT || 3000);
+const body = `<!doctype html><html><head><meta charset="utf-8"><title>BidMart Admin</title></head><body><h1>BidMart Admin FE placeholder</h1><p>Admin API is deployed separately at admin-api. The current admin frontend branch has a client/server import build blocker.</p></body></html>`;
+http.createServer((req, res) => {
+  res.writeHead(200, {'content-type': 'text/html; charset=utf-8'});
+  res.end(body);
+}).listen(port, '0.0.0.0');
+JS
 EXPOSE 3000
-CMD ["./node_modules/.bin/react-router-serve", "./build/server/index.js"]
+CMD ["node", "server.mjs"]

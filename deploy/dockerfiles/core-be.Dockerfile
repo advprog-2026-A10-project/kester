@@ -1,7 +1,7 @@
-FROM rust:1.88-bookworm AS builder
+FROM rust:1.92-bookworm AS builder
 WORKDIR /app
 COPY services/bidmart-core-be .
-RUN cargo build --release --bins
+RUN cargo build --release --bin bidmart-core-be
 
 FROM debian:bookworm-slim
 RUN apt-get update \
