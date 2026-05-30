@@ -101,6 +101,13 @@ docker compose ps
 Set `IMAGE_TAG=latest` for the newest alpha image, or set it to a short git SHA from the `images`
 GitHub Actions workflow to deploy/rollback a specific version.
 
+Tagged releases are also supported. A tag such as `v0.1.0-alpha.1` publishes matching GHCR image
+tags and creates a GitHub Release. To deploy or rollback to a known tag on the VM:
+
+```bash
+./scripts/deploy-version.sh v0.1.0-alpha.1
+```
+
 If GHCR packages are private, the VM must authenticate before `docker compose pull`:
 
 ```bash

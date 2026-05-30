@@ -29,6 +29,7 @@ Copy `.env.example` to `.env` on the Google Cloud VM. Do not commit `.env`.
 | `APP_PASSWORD_RESET_URL_BASE` | `https://auth.bidmart.bid/auth/reset-password?token=` | Auth BE | No | Yes |
 | `APP_CORS_ALLOWED_ORIGINS` | `https://bidmart.bid,https://auth.bidmart.bid` | Auth BE | No | Yes |
 | `APP_AUTH_SESSION_COOKIE_SECURE` | `true` | Auth BE | No | Yes for HTTPS |
+| `APP_AUTH_SESSION_COOKIE_DOMAIN` | `.bidmart.bid` | Auth BE | No | Yes when Auth FE and Auth BE use sibling subdomains |
 | `APP_AUTO_MIGRATE_ON_STARTUP` | `true` | Core BE | No | Alpha yes; prod prefer explicit migration |
 | `WS_POLL_INTERVAL_MS` | `2000` | Bidding WS | No | Optional |
 | `WS_HEARTBEAT_MS` | `30000` | Bidding WS | No | Optional |
